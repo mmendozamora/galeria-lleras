@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'fotos/**'
+      - '.github/workflows/generar-fotos-json.yml'
 
 permissions:
   contents: write
@@ -15,6 +16,8 @@ jobs:
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Generar fotos.json
         run: |
@@ -38,8 +41,14 @@ jobs:
           print(f"Generadas {len(fotos)} fotos")
           PY
 
-      - name: Guardar cambios
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Actualizar fotos.json automaticamente
-          file_pattern: fotos.json
+      - name: Configurar Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Guardar fotos.json
+        run: |
+          git add fotos.json
+          git commit -m "Actualizar fotos.json automaticamente" || echo "No hay cambios para guardar"
+          git pull --rebase origin main
+          git push origin main       
