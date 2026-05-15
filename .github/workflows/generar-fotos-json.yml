@@ -19,16 +19,18 @@ jobs:
       - name: Generar fotos.json
         run: |
           python3 << 'PY'
-          import os, json
+          import os
+          import json
 
           carpeta = "fotos"
           extensiones = (".jpg", ".jpeg", ".png", ".webp")
 
           fotos = []
 
-          for archivo in sorted(os.listdir(carpeta)):
-              if archivo.lower().endswith(extensiones):
-                  fotos.append(f"{carpeta}/{archivo}")
+          if os.path.isdir(carpeta):
+              for archivo in sorted(os.listdir(carpeta)):
+                  if archivo.lower().endswith(extensiones):
+                      fotos.append(f"{carpeta}/{archivo}")
 
           with open("fotos.json", "w", encoding="utf-8") as f:
               json.dump(fotos, f, ensure_ascii=False, indent=2)
@@ -39,4 +41,5 @@ jobs:
       - name: Guardar cambios
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Actualizar fotos.json automáticamente
+          commit_message: Actualizar fotos.json automaticamente
+          file_pattern: fotos.json
